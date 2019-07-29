@@ -2,17 +2,23 @@ require 'rest-client'
 require 'json'
 require 'pry'
 
+def get_people_from_api
+    response_string = RestClient.get('http://www.swapi.co/api/people/')
+    response_hash = JSON.parse(response_string)
+end
 
+def get_character_from_api(character_name)
+  characters = get_people_from_api
+  character = characters["results"].find do |character|
+    character["name"].downcase == character_name
+  end
+  character
+end
 
 
 def get_character_movies_from_api(character_name)
-  #make the web request
-  response_string = RestClient.get('http://www.swapi.co/api/people/')
-  response_hash = JSON.parse(response_string)
-  character = response_hash["results"].find do |character|
-    character["name"].downcase == character_name
-  end
-  films = character[0]["films"].map do |film|
+  character = get_character_from_api(character_name)
+  films = character["films"].map do |film|
     film_string = RestClient.get(film)
     film_hash = JSON.parse(film_string)
   end
